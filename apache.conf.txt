@@ -1,0 +1,41 @@
+ServerTokens Full                              Servertokenoff This might send full info which might not be needed and should have the permissions
+ServerSignature On                              Server Signature Off
+
+Listen 80                                       listen 443
+Listen 8000
+
+<VirtualHost *:80>                              <VirtualHost 443*:>
+    ServerName insecure.test
+    DocumentRoot "/var/www/site"
+
+    <Directory "/var/www/site">
+        Options All                                    Allows all options even if not required
+        AllowOverride All                                AllowOverride None
+        Require all granted
+    </Directory>
+
+    Alias /uploads "/var/www/uploads"                    Here the file uploaded are visible publicly
+    <Directory "/var/www/uploads">
+        Options +Indexes +FollowSymLinks                 Options-Indexes
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog "/tmp/error.log"                           Storing inside the logs can lead to expose the sensitive content
+    CustomLog "/tmp/access.log" combined
+</VirtualHost>
+
+<VirtualHost *:8000>
+    ServerName devpanel.test
+    DocumentRoot "/var/www/dev"
+
+    <Directory "/var/www/dev">                          Can allow any script to execute
+        Options ExecCGI Includes
+        AllowOverride All[NONE]                          AllowOverride NONE      
+        Require all granted                              Require all Denied
+    </Directory>
+</VirtualHost>
+
+AddType application/x-httpd-php .php .phtml         Only HTTP is allowed, might take HTTPS or TLS for Saftey
+AddHandler cgi-script .cgi .py
+AccessFileName .htaccess
