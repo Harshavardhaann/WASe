@@ -1,0 +1,240 @@
+Docker Installation
+
+Step-by-Step Installation Guide
+Step 1: Install Docker (if not already installed)
+
+sudo apt update
+sudo apt install docker.io -y
+sudo systemctl start docker
+sudo systemctl enable docker
+Verify Docker is working:
+--------------------------------------------------------------------------------------------
+bWAPP (Buggy Web App)
+This is a PHP-based application with over 100+ bugs for practice.
+
+Step 1: Pull Docker Image
+docker pull raesene/bwapp
+
+Step 2: Run the Container
+docker run -d -p 8080:80 raesene/bwapp
+
+Step 3: Access in Browser
+http://localhost:8080/install.php
+Click "Click here to install bWAPP!"
+
+Login: bee
+Password: bug
+
+bWAPP is now ready for testing and exploitation!
+
+Access: http://localhost:8080
+
+Test 1: SQL Injection
+Go to: SQL Injection → Search
+Payload: ' OR '1'='1
+Bypasses filters and returns unintended data
+
+Test 2: Reflected XSS
+Go to: XSS → Reflected
+Payload: <script>alert('XSS')</script>
+Shows alert if vulnerable
+
+Test 3: Command Injection
+Go to: OS Command Injection module
+Payload: 127.0.0.1; whoami
+Executes system commands
+
+bWAPP contains vulnerabilities from the full OWASP Top 10 and more.
+
+------------------------------------------------------------------------------------------------
+
+BadStore
+A deliberately insecure web app simulating online shopping with poor validation.
+
+Step 1: Pull Docker Image
+docker pull jvhoof/badstore-docker
+
+Step 2: Run the Container
+docker run -d -p 80:80 jvhoof/badstore-docker
+
+Step 3: Access in Browser
+http://localhost
+
+BadStore is now ready for testing and exploitation!
+
+Access: http://localhost
+
+Test 1: Reflected XSS
+Search for: <script>alert('XSS')</script>
+Triggers popup if vulnerable
+
+Test 2: Stored XSS
+Submit the above payload via the feedback form.
+Revisit admin/feedback section to trigger the stored script
+
+Test 3: Cookie Theft / Session Hijack
+Use XSS to grab document.cookie and simulate session stealing
+
+BadStore is vulnerable to XSS, insecure forms, and session handling flaws.
+
+------------------------------------------------------------------------------------------------------------------
+
+OWASP Juice Shop
+A modern Node.js app intentionally vulnerable to showcase OWASP Top 10.
+
+Step 1: Pull Docker Image
+docker pull bkimminich/juice-shop
+
+Step 2: Run the Container
+docker run -d -p 3000:3000 bkimminich/juice-shop
+
+Step 3: Access in Browser
+http://localhost:3000
+
+Juice Shop is now ready for testing and exploitation!
+
+Access: http://localhost:3000
+
+Test 1: Admin Panel Access
+Navigate to: /#/administration
+Exposes admin panel
+
+Test 2: Stored XSS
+Submit: <script>alert('XSS')</script> in feedback
+Triggers in admin feedback section
+
+Test 3: JWT Manipulation
+Inspect localStorage token
+Change role to "admin" and replay the token
+
+Juice Shop is vulnerable to XSS, insecure JWTs, broken access control, and more.
+
+--------------------------------------------------------------------------------------------------------------
+
+XVuln
+A vulnerable stack replicating real CVEs in services like Apache, Tomcat, and others.
+
+Step 1: Clone the Repo
+git clone https://github.com/CoolerVoid/X-Vuln-Stack.git
+cd X-Vuln-Stack
+
+Step 2: Build Docker Container
+docker build -t xvuln .
+
+Step 3: Run the Container
+docker run -d -p 9000:80 xvuln
+
+Step 4: Access in Browser
+http://localhost:9000
+
+XVuln is now ready for testing and exploitation!
+
+Access: http://localhost:9000
+
+Test 1: Local File Inclusion
+If URL is like ?page=index, change to:
+?page=../../../../etc/passwd
+
+Test 2: Remote Code Execution
+Look for file upload or eval() injection points, use payloads like:
+<?php system('id'); ?>
+
+Test 3: CVE Simulation
+Refer to CVE descriptions in the repo to reproduce known exploits
+
+XVuln simulates real-world CVEs for LFI, RCE, XSS, and insecure configs.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Gin and Juice Shop
+This is part of the OWASP DevSecOps Pipeline Demo. You can deploy only the Gin and Juice vulnerable app.
+
+Step 1: Clone the Repo
+git clone https://github.com/OWASP/owasp-devsecops-maturity-model.git
+cd owasp-devsecops-maturity-model/ginandjuice
+
+Step 2: Build Docker Container
+docker build -t ginandjuice .
+
+Step 3: Run the Container
+docker run -d -p 8085:8080 ginandjuice
+
+Step 4: Access in Browser
+http://localhost:8085
+
+Gin and Juice is now ready for testing and exploitation!
+
+Access: http://localhost:8085
+
+Test 1: SQL Injection
+Try to login with:
+admin' OR 1=1 --
+
+Test 2: Reflected XSS
+Use:
+<script>alert('XSS')</script>
+in search or contact forms
+
+Test 3: Auth Bypass / Session Fixation
+Inspect cookies — try reusing session cookies to switch roles
+
+Gin and Juice is vulnerable to OWASP Top 10 issues and CI/CD pipeline misconfigurations.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ 1. List all containers (running & stopped):
+
+docker ps -a
+This shows container IDs, names, and statuses.
+
+2. Remove a container by name or ID:
+
+docker rm <container_name_or_id>
+Example:
+sudo docker rm xvwa
+
+3. If the container is still running, stop it first:
+
+sudo docker stop xvwa
+sudo docker rm xvwa
+
+4. Force-remove a running container (not recommended unless necessary):
+
+sudo docker rm -f xvwa
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+How to Use SQLMap in Kali Linux
+SQLMap is pre-installed in most versions of Kali Linux.
+
+📌 Check if it’s installed:
+sqlmap --version
+If it shows the version, you're good to go. If not, install it:
+
+sudo apt update
+sudo apt install sqlmap
+
+Basic SQLMap Usage
+1. Test a URL for SQL Injection
+
+sqlmap -u "http://example.com/page.php?id=1" --batch
+--batch runs with default answers to prompts.
+
+2. Find Databases
+sqlmap -u "http://example.com/page.php?id=1" --dbs
+
+3. Find Tables in a Database
+sqlmap -u "http://example.com/page.php?id=1" -D database_name --tables
+
+4. Find Columns in a Table
+sqlmap -u "http://example.com/page.php?id=1" -D database_name -T table_name --columns
+
+5. Dump Table Data
+sqlmap -u "http://example.com/page.php?id=1" -D database_name -T table_name --dump
+Tip: Use it on Local Test Apps
+If you're running test environments like:
+
+bWAPP → http://localhost:8080/bWAPP/sqli_1.php?id=1
+
+XVWA → http://localhost:9090/xvwa/vulnerabilities/sqli/
+
+You can use SQLMap like this:
+sqlmap -u "http://localhost:9090/xvwa/vulnerabilities/sqli/?id=1&Submit=Submit" --cookie="PHPSESSID=xyz" --batch
+You may need to copy cookies from your browser session to stay authenticated.
+
